@@ -1,0 +1,354 @@
+#!/usr/bin/env python3
+"""
+rpconnect - Connect to RunPod instance and create POD_STATE.json
+Usage: rpconnect <pod_id>
+Example: rpconnect 4ztqpjxv79e841
+"""
+
+import sys
+import json
+import subprocess
+import requests
+from datetime import datetime
+from pathlib import Path
+
+# Colors for terminal output
+class Colors:
+    CYAN = '\033[0;36m'
+    GREEN = '\033[0;32m'
+    YELLOW = '\033[1;33m'
+    RED = '\033[0;31m'
+    BOLD = '\033[1m'
+    NC = '\033[0m'  # No Color
+
+def print_color(message, color=''):
+    """Print message with color"""
+    print(f"{color}{message}{Colors.NC}")
+
+def print_header(message):
+    """Print styled header"""
+    print_color(f"\n{'='*60}", Colors.CYAN)
+    print_color(message, f"{Colors.CYAN}{Colors.BOLD}")
+    print_color(f"{'='*60}", Colors.CYAN)
+
+def load_runpod_api_key():
+    """Load RunPod API key - matches config.py logic exactly"""
+    # Check environment variable first
+    api_key = os.getenv("RUNPOD_API_KEY")
+    if api_key:
+        return api_key
+    
+    # Use same paths as config.py
+    base_path = Path(os.getenv("RPAGENT_BASE_PATH", Path.home() / "rpagent"))
+    secrets_path = base_path / "Secrets"
+    runpod_key_file = secrets_path / "Runpod_API_Key.json"
+    
+    if runpod_key_file.exists():
+        try:
+            with open(runpod_key_file, 'r') as f:
+                content = f.read().strip()
+                try:
+                    # Try parsing as JSON first
+                    data = json.loads(content)
+                    return data.get('api_key', content)
+                except json.JSONDecodeError:
+                    # If not JSON, treat as plain text API key
+                    return content
+        except Exception as e:
+            print_color(f"   ⚠️  Warning: Could not load API key: {e}", Colors.YELLOW)
+            return None
+    else:
+        # No API key found
+        return None
+
+def get_pod_info_from_api(pod_id, api_key):
+    """Query RunPod API to get pod information"""
+    print_color(f"\n🔍 Querying RunPod API for pod {pod_id}...", Colors.YELLOW)
+    
+    url = f"https://api.runpod.io/graphql?api_key={api_key}"
+    headers = {"Content-Type": "application/json"}
+    
+    query = """
+    query {
+        myself {
+            pods {
+                id
+                name
+                desiredStatus
+                machine {
+                    podHostId
+                }
+            }
+        }
+    }
+    """
+    
+    try:
+        response = requests.post(url, headers=headers, json={"query": query}, timeout=10)
+        response.raise_for_status()
+        result = response.json()
+        
+        # Find the specific pod
+        pods = result.get('data', {}).get('myself', {}).get('pods', [])
+        for pod in pods:
+            if pod.get('id') == pod_id:
+                print_color("   ✅ Pod found in RunPod API", Colors.GREEN)
+                return pod
+        
+        print_color(f"   ❌ Pod {pod_id} not found in your account", Colors.RED)
+        return None
+        
+    except requests.exceptions.Timeout:
+        print_color("   ❌ RunPod API request timed out", Colors.RED)
+        return None
+    except requests.exceptions.RequestException as e:
+        print_color(f"   ❌ API request failed: {e}", Colors.RED)
+        return None
+    except Exception as e:
+        print_color(f"   ❌ Error parsing API response: {e}", Colors.RED)
+        return None
+
+def test_ssh_connection(ssh_user, ssh_host, ssh_key):
+    """Test SSH connection to the pod"""
+    print_color(f"\n📡 Testing SSH connection to {ssh_user}@{ssh_host}...", Colors.YELLOW)
+    
+    ssh_cmd = [
+        "ssh",
+        f"{ssh_user}@{ssh_host}",
+        "-i", ssh_key,
+        "-o", "StrictHostKeyChecking=no",
+        "-o", "UserKnownHostsFile=/dev/null",
+        "-o", "ConnectTimeout=10",
+        "-o", "LogLevel=ERROR",
+        "echo 'Connection test successful'"
+    ]
+    
+    try:
+        result = subprocess.run(
+            ssh_cmd,
+            capture_output=True,
+            text=True,
+            timeout=15
+        )
+        
+        if result.returncode == 0:
+            print_color("   ✅ SSH connection verified!", Colors.GREEN)
+            return True
+        else:
+            print_color(f"   ❌ SSH connection failed", Colors.RED)
+            if result.stderr:
+                print_color(f"   Error: {result.stderr.strip()}", Colors.RED)
+            return False
+            
+    except subprocess.TimeoutExpired:
+        print_color("   ❌ SSH connection timed out (10 seconds)", Colors.RED)
+        return False
+    except Exception as e:
+        print_color(f"   ❌ Error testing connection: {e}", Colors.RED)
+        return False
+
+def create_pod_state(pod_id, ssh_user, pod_name=None):
+    """Create POD_STATE.json with proper format"""
+    
+    ssh_host = "ssh.runpod.io"
+    ssh_key = "~/.ssh/id_ed25519"
+    
+    # Save to TitleCuts_AI_Comfy_Repo directory
+    base_path = Path(os.getenv("RPAGENT_BASE_PATH", Path.home() / "rpagent"))
+    comfy_repo_dir = base_path / "TitleCuts_AI_Comfy_Repo"
+    state_file = comfy_repo_dir / "POD_STATE.json"
+    
+    # Create pod state in format expected by config.py and shortcuts
+    pod_state = {
+        "runpod_config": {
+            "current_pod_id": pod_id,
+            "pod_name": pod_name or f"Pod {pod_id}",
+            "pod_host_id": ssh_user,
+            "ssh_command": f"ssh {ssh_user}@{ssh_host} -i {ssh_key}",
+            "comfyui_url": f"https://{pod_id}-8188.proxy.runpod.net",
+            "ssh_host": ssh_host,
+            "ssh_port": 22,
+            "ssh_user": ssh_user,
+            "ssh_key": ssh_key,
+            "connected": True,
+            "connected_at": datetime.utcnow().isoformat() + "Z"
+        }
+    }
+    
+    # Write POD_STATE.json
+    try:
+        with open(state_file, 'w') as f:
+            json.dump(pod_state, f, indent=2)
+        print_color(f"   ✅ POD_STATE.json created: {state_file}", Colors.GREEN)
+        return state_file, pod_state
+    except Exception as e:
+        print_color(f"   ❌ Failed to create POD_STATE.json: {e}", Colors.RED)
+        return None, None
+
+def main():
+    """Main function"""
+    
+    # Check arguments
+    if len(sys.argv) < 2 or sys.argv[1] in ['--help', '-h']:
+        print_color("rpconnect - Connect to RunPod Instance", Colors.CYAN)
+        print()
+        print("Usage:")
+        print("  rpconnect <pod_id> [pod_name]")
+        print()
+        print("Examples:")
+        print("  rpconnect 4ztqpjxv79e841")
+        print("  rpconnect 4ztqpjxv79e841 \"My Comfy Pod\"")
+        print()
+        print("The command will:")
+        print("  1. Auto-fetch SSH connection info from RunPod API")
+        print("  2. Test the SSH connection")
+        print("  3. Create POD_STATE.json")
+        print("  4. Make rpagent and shortcuts work with your pod")
+        print()
+        print("Note: Requires RunPod API key at:")
+        print("  ~/rpagent/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
+        print()
+        print("If API key is missing, falls back to manual SSH entry.")
+        print()
+        sys.exit(0 if '--help' in sys.argv else 1)
+    
+    pod_id = sys.argv[1]
+    pod_name = sys.argv[2] if len(sys.argv) > 2 else None
+    
+    # Header
+    print_header(f"🔌 Connecting to RunPod: {pod_id}")
+    
+    # Step 1: Load RunPod API key
+    api_key = load_runpod_api_key()
+    
+    if not api_key:
+        print_color("\n❌ RunPod API key not found", Colors.RED)
+        print()
+        print("API key should be at:")
+        print("  ~/rpagent/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
+        print()
+        print("Falling back to manual SSH entry...")
+        print()
+        
+        # Fallback to manual entry
+        print_color("📋 Manual SSH Connection Setup", Colors.YELLOW)
+        print()
+        print("From your RunPod dashboard, copy the SSH connection string.")
+        print("It looks like: 4ztqpjxv79e841-64411caf@ssh.runpod.io")
+        print("          or: 4ztqpjxv79e841-64411caf")
+        print()
+        
+        try:
+            ssh_input = input("Paste SSH string here: ").strip()
+        except KeyboardInterrupt:
+            print_color("\n\n❌ Cancelled by user", Colors.RED)
+            sys.exit(1)
+        
+        if not ssh_input:
+            print_color("\n❌ SSH string is required", Colors.RED)
+            sys.exit(1)
+        
+        # Parse SSH string (handle both formats)
+        if '@ssh.runpod.io' in ssh_input:
+            ssh_user = ssh_input.split('@')[0]
+        else:
+            ssh_user = ssh_input
+        
+        # Use manually entered name
+        if not pod_name:
+            pod_name = f"Pod {pod_id}"
+    else:
+        # Step 2: Query RunPod API for pod info
+        pod_info = get_pod_info_from_api(pod_id, api_key)
+        
+        if not pod_info:
+            print_color("\n❌ Could not fetch pod info from API", Colors.RED)
+            print()
+            print("Possible reasons:")
+            print("  • Pod ID is incorrect")
+            print("  • Pod has been terminated")
+            print("  • API key doesn't have access to this pod")
+            print()
+            print("Try manual SSH entry:")
+            print(f"  rpconnect {pod_id} --manual")
+            sys.exit(1)
+        
+        # Extract SSH connection info from API response
+        pod_host_id = pod_info.get('machine', {}).get('podHostId')
+        
+        if not pod_host_id:
+            print_color("\n❌ Pod SSH connection info not available from API", Colors.RED)
+            print()
+            print("This pod might not be running yet.")
+            print("Check pod status in RunPod dashboard.")
+            sys.exit(1)
+        
+        ssh_user = pod_host_id
+        
+        # Use pod name from API if not provided
+        if not pod_name:
+            pod_name = pod_info.get('name') or f"Pod {pod_id}"
+        
+        print_color(f"   ✅ SSH connection: {ssh_user}@ssh.runpod.io", Colors.GREEN)
+    
+    # Validate SSH user format
+    if '-' not in ssh_user:
+        print_color(f"\n❌ Invalid SSH format. Expected: {pod_id}-XXXXXXXX", Colors.RED)
+        sys.exit(1)
+    
+    ssh_pod_id = ssh_user.split('-')[0]
+    if ssh_pod_id != pod_id:
+        print_color(f"\n⚠️  Warning: SSH pod ID ({ssh_pod_id}) doesn't match provided pod ID ({pod_id})", Colors.YELLOW)
+        response = input("Continue anyway? [y/N] ").strip().lower()
+        if response not in ['y', 'yes']:
+            print_color("❌ Cancelled", Colors.RED)
+            sys.exit(1)
+    
+    # Step 3: Test SSH connection
+    ssh_host = "ssh.runpod.io"
+    ssh_key_path = str(Path.home() / ".ssh/id_ed25519")
+    
+    if not Path(ssh_key_path).exists():
+        print_color(f"\n❌ SSH key not found: {ssh_key_path}", Colors.RED)
+        print_color("   Please ensure your SSH key is set up for RunPod", Colors.YELLOW)
+        sys.exit(1)
+    
+    if not test_ssh_connection(ssh_user, ssh_host, ssh_key_path):
+        print_color("\n❌ Failed to connect to pod", Colors.RED)
+        print()
+        print("Troubleshooting:")
+        print(f"  • Verify pod {pod_id} is running in RunPod dashboard")
+        print("  • Check SSH string is correct")
+        print(f"  • Verify SSH key exists: {ssh_key_path}")
+        print("  • Test manually: ssh " + ssh_user + "@ssh.runpod.io -i " + ssh_key_path)
+        sys.exit(1)
+    
+    # Step 4: Create POD_STATE.json
+    print_color(f"\n📝 Creating POD_STATE.json...", Colors.YELLOW)
+    state_file, pod_state = create_pod_state(pod_id, ssh_user, pod_name)
+    
+    if not state_file:
+        sys.exit(1)
+    
+    # Step 5: Success!
+    config = pod_state['runpod_config']
+    print_header("🎉 Pod Connected Successfully!")
+    print()
+    print_color(f"Pod ID:      {config['current_pod_id']}", Colors.GREEN)
+    print_color(f"Pod Name:    {config['pod_name']}", Colors.GREEN)
+    print_color(f"SSH:         {ssh_user}@{ssh_host}", Colors.GREEN)
+    print_color(f"ComfyUI:     {config['comfyui_url']}", Colors.GREEN)
+    print_color(f"State File:  {state_file}", Colors.GREEN)
+    print()
+    print_color("="*60, Colors.CYAN)
+    print()
+    print_color("💡 Next Steps:", Colors.YELLOW)
+    print("   • Test connection:    python3 runpod_agent.py comfy")
+    print("   • List workflows:     rpworkflows")
+    print("   • Run a workflow:     rpscene <workflow.json> <scene_name>")
+    print("   • Check recent outputs: rplast")
+    print()
+
+if __name__ == "__main__":
+    main()
+

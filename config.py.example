@@ -1,0 +1,82 @@
+"""
+rpAgent Configuration
+Copy to config.py and set your values
+"""
+import os
+import json
+from pathlib import Path
+
+
+class AgentConfig:
+    """Simplified configuration for rpAgent core"""
+    
+    def __init__(self):
+        # RunPod API Key (required)
+        self.runpod_api_key = os.getenv('RUNPOD_API_KEY', '')
+        
+        if not self.runpod_api_key:
+            # Try loading from secrets file
+            secrets_path = Path(os.getenv('RPAGENT_SECRETS', Path.home() / "rpagent" / "Secrets"))
+            key_file = secrets_path / "Runpod_API_Key.json"
+            if key_file.exists():
+                with open(key_file) as f:
+                    try:
+                        data = json.load(f)
+                        self.runpod_api_key = data.get('api_key', '')
+                    except:
+                        self.runpod_api_key = f.read().strip()
+        
+        # SSH Configuration
+        self.ssh_key_path = Path(os.getenv('SSH_KEY_PATH', Path.home() / ".ssh" / "id_ed25519"))
+        
+        # Workspace (where POD_STATE.json is stored)
+        self.workspace_path = Path(os.getenv('RPAGENT_WORKSPACE', Path.home() / "rpagent"))
+        self.workspace_path.mkdir(parents=True, exist_ok=True)
+        
+        # Pod state
+        self.pod_state = {}
+        self._load_pod_state()
+    
+    def _load_pod_state(self):
+        """Load current pod state from POD_STATE.json"""
+        pod_state_file = self.workspace_path / "POD_STATE.json"
+        if pod_state_file.exists():
+            try:
+                with open(pod_state_file) as f:
+                    self.pod_state = json.load(f)
+            except Exception as e:
+                print(f"⚠️  Could not load POD_STATE.json: {e}")
+    
+    def get_pod_id(self):
+        """Get current pod ID"""
+        return self.pod_state.get('runpod_config', {}).get('current_pod_id')
+    
+    def get_pod_host(self):
+        """Get current pod host ID for SSH"""
+        return self.pod_state.get('runpod_config', {}).get('pod_host_id')
+    
+    def get_pod_name(self):
+        """Get current pod name"""
+        return self.pod_state.get('runpod_config', {}).get('pod_name', 'unknown')
+    
+    def get_ssh_command(self):
+        """Get SSH command for current pod"""
+        host = self.get_pod_host()
+        if not host:
+            return None
+        return f"ssh root@{host}-22.proxy.runpod.net -i {self.ssh_key_path}"
+    
+    def set_current_pod(self, pod_id, pod_name=None, pod_host_id=None):
+        """Save current pod configuration"""
+        self.pod_state = {
+            'runpod_config': {
+                'current_pod_id': pod_id,
+                'pod_name': pod_name or pod_id,
+                'pod_host_id': pod_host_id,
+            }
+        }
+        pod_state_file = self.workspace_path / "POD_STATE.json"
+        with open(pod_state_file, 'w') as f:
+            json.dump(self.pod_state, f, indent=2)
+        print(f"✓ Current pod set to: {self.pod_state['runpod_config']['pod_name']}")
+

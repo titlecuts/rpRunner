@@ -1,0 +1,60 @@
+# Configuration (users create their own)
+config.py
+POD_STATE.json
+pod_state.json
+
+# API Keys and Secrets
+**/Secrets/
+**/*_API_Key.*
+**/*API_Key.*
+*.key
+*.pem
+*.json.secret
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+venv/
+ENV/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Outputs (user-generated)
+outputs/
+generated_outputs/
+*.png
+*.jpg
+*.jpeg
+*.mp4
+*.mp3
+*.wav
+*.webm
+*.gif
+
+# Logs
+audit_log.json
+*.log
+logs/
+.rprun_history
+
+# OS
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
