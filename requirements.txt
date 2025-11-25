@@ -1,10 +1,6 @@
 runpod>=1.6.0
-google-cloud-storage>=2.10.0
 paramiko>=3.3.0
 rich>=13.5.0
 requests>=2.31.0
 click>=8.1.0
 python-dotenv>=1.0.0
-fal-client>=0.4.0
-openai>=1.0.0
-
