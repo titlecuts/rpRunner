@@ -49,26 +49,21 @@ source ~/.zshrc
 ## Quick Start
 
 ```bash
-# Set your API key
+# 1. Install shortcuts (one-time)
+./install_shortcuts.sh
+source ~/.zshrc  # or ~/.bashrc
+
+# 2. Set your API key
 export RUNPOD_API_KEY="your_key_here"
 
-# List your pods
-python3 rprunner.py pods
-
-# Connect to a pod (auto-configures everything)
-python3 rprunner.py connect <pod_id>
-
-# Or use shortcut after install
+# 3. Connect to your pod
 rpconnect <pod_id>
 
-# Check pod health
-rpcheck
-
-# Upload a file
-rpupload ./myfile.png
-
-# Download a file
-rpdownload /workspace/output.png ./local_output.png
+# That's it! Now you can:
+rpp                  # List pods
+rpcheck              # Health check
+rpupload file.png    # Upload
+rpdownload /workspace/out.png ./  # Download
 ```
 
 ---
