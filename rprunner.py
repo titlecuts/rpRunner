@@ -3,8 +3,8 @@
 rpRunner™ - Zero-touch CLI for RunPod GPU management
 
 Core pod management functionality only.
-For ComfyUI automation, see rpComfy add-on.
-For multi-provider AI, see rpAPI add-on.
+For ComfyUI automation, see rpComfy™ add-on.
+For multi-provider AI, see rpAPI™ add-on.
 """
 import sys
 import argparse
@@ -275,10 +275,10 @@ Examples:
   rprunner.py keys                     # Verify API keys
 
 Add-ons:
-  rpComfy - ComfyUI workflow automation
-  rpAPI - Multi-provider AI orchestration
-  rpPipe - Production tracking
-  rpStore - Storage optimization
+  rpComfy™ - ComfyUI workflow automation
+  rpAPI™ - Multi-provider AI orchestration
+  rpPipe™ - Production tracking
+  rpStore™ - Storage optimization
         """
     )
     

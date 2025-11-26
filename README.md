@@ -135,7 +135,7 @@ All in 2-3 seconds.
 
 rpRunner™ is the foundation. Additional modules available for advanced workflows:
 
-### rpComfy (Private)
+### rpComfy™ (Private)
 ComfyUI workflow automation with:
 - Full pipeline execution (upload → queue → monitor → download)
 - Reference image management
@@ -143,7 +143,7 @@ ComfyUI workflow automation with:
 - SaveImage path rewriting
 - Workflow shortcuts (`rpscene`, `rpchar`, `rptest`)
 
-### rpAPI (Private)
+### rpAPI™ (Private)
 Multi-provider AI orchestration:
 - 13+ AI services with unified interface
 - Video (Fal.ai, Runway, LTX)
@@ -151,14 +151,14 @@ Multi-provider AI orchestration:
 - Images (FLUX, DALL-E, Imagen)
 - Music generation
 
-### rpPipe (Private)
+### rpPipe™ (Private)
 Production tracking and management:
 - Airtable integration
 - Shot list management
 - Generation logging
 - Error detection & solutions database
 
-### rpStore (Private)
+### rpStore™ (Private)
 Hybrid storage for 98% cost reduction:
 - 3-tier storage (hot/warm/cold)
 - GCS sync automation
@@ -277,10 +277,10 @@ Contributions welcome! This is the free, open-source foundation.
 - 🔄 Connection pooling
 
 **Add-ons (Private/Commercial):**
-- ComfyUI automation (rpComfy)
-- Provider integrations (rpAPI)
-- Production tracking (rpPipe)
-- Storage optimization (rpStore)
+- ComfyUI automation (rpComfy™)
+- Provider integrations (rpAPI™)
+- Production tracking (rpPipe™)
+- Storage optimization (rpStore™)
 
 ---
 
@@ -296,7 +296,7 @@ MIT License - see [LICENSE](LICENSE)
 A: No, this is a community tool that uses RunPod's public API.
 
 **Q: What about the add-ons?**  
-A: rpRunner (core) is free and open-source. The add-ons (rpComfy, rpAPI, rpPipe, rpStore) are private commercial modules built for production workflows. Contact for licensing.
+A: rpRunner (core) is free and open-source. The add-ons (rpComfy™, rpAPI™, rpPipe™, rpStore™) are private commercial modules built for production workflows. Contact for licensing.
 
 **Q: Can I build my own add-ons?**  
 A: Absolutely! rpRunner is MIT licensed. Build whatever you want on top of it.
