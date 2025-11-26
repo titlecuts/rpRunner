@@ -1,4 +1,4 @@
-# rpAgent
+# rpRunner™
 
 **Zero-touch CLI for RunPod GPU management**
 
@@ -7,9 +7,9 @@
 
 ---
 
-## What is rpAgent?
+## What is rpRunner™?
 
-rpAgent eliminates the friction of connecting to RunPod GPU instances. No more copy-pasting SSH commands or manually configuring connections.
+rpRunner™ eliminates the friction of connecting to RunPod GPU instances. No more copy-pasting SSH commands or manually configuring connections.
 
 ```bash
 # That's it. You're connected.
@@ -31,8 +31,8 @@ rpconnect abc123xyz
 ## Installation
 
 ```bash
-git clone https://github.com/titlecuts/rpAgent.git
-cd rpAgent
+git clone https://github.com/titlecuts/rpRunner.git
+cd rpRunner
 pip install -r requirements.txt
 
 # Configure
@@ -53,10 +53,10 @@ source ~/.zshrc
 export RUNPOD_API_KEY="your_key_here"
 
 # List your pods
-python3 rpagent.py pods
+python3 rprunner.py pods
 
 # Connect to a pod (auto-configures everything)
-python3 rpagent.py connect <pod_id>
+python3 rprunner.py connect <pod_id>
 
 # Or use shortcut after install
 rpconnect <pod_id>
@@ -124,7 +124,7 @@ echo '{"api_key": "your_key_here"}' > ~/rpagent/Secrets/Runpod_API_Key.json
 
 ## How rpconnect Works
 
-rpAgent's `rpconnect` command automates the entire connection process:
+rpRunner's `rpconnect` command automates the entire connection process:
 
 1. **API Query**: Fetches pod details from RunPod GraphQL API
 2. **SSH Config**: Extracts connection info (host, port)
@@ -138,7 +138,7 @@ All in 2-3 seconds.
 
 ## Add-ons
 
-rpAgent is the foundation. Additional modules available for advanced workflows:
+rpRunner™ is the foundation. Additional modules available for advanced workflows:
 
 ### rpComfy (Private)
 ComfyUI workflow automation with:
@@ -228,11 +228,11 @@ rpcheck
 
 ---
 
-## Why rpAgent?
+## Why rpRunner?
 
 Built from real production frustration:
 
-**Before rpAgent:**
+**Before rpRunner:**
 1. Go to RunPod dashboard
 2. Find pod
 3. Copy SSH command
@@ -241,7 +241,7 @@ Built from real production frustration:
 6. Forget which pod you're on
 7. Repeat daily
 
-**With rpAgent:**
+**With rpRunner:**
 ```bash
 rpconnect abc123xyz
 ```
@@ -301,10 +301,10 @@ MIT License - see [LICENSE](LICENSE)
 A: No, this is a community tool that uses RunPod's public API.
 
 **Q: What about the add-ons?**  
-A: rpAgent (core) is free and open-source. The add-ons (rpComfy, rpAPI, rpPipe, rpStore) are private commercial modules built for production workflows. Contact for licensing.
+A: rpRunner (core) is free and open-source. The add-ons (rpComfy, rpAPI, rpPipe, rpStore) are private commercial modules built for production workflows. Contact for licensing.
 
 **Q: Can I build my own add-ons?**  
-A: Absolutely! rpAgent is MIT licensed. Build whatever you want on top of it.
+A: Absolutely! rpRunner is MIT licensed. Build whatever you want on top of it.
 
 **Q: Does this work with other GPU cloud providers?**  
 A: Currently RunPod only. The core architecture could be adapted for other providers.
@@ -324,8 +324,8 @@ Inspired by frustration with manual RunPod workflows and a desire for zero-frict
 
 ## Support
 
-- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/titlecuts/rpAgent/issues)
-- 💬 **Discussions**: [GitHub Discussions](https://github.com/titlecuts/rpAgent/discussions)
+- 🐛 **Bug Reports**: [GitHub Issues](https://github.com/titlecuts/rpRunner/issues)
+- 💬 **Discussions**: [GitHub Discussions](https://github.com/titlecuts/rpRunner/discussions)
 - 📧 **Commercial Inquiries**: titlecuts@gmail.com
 
 ---

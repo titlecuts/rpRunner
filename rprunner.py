@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-rpAgent - Zero-touch CLI for RunPod GPU management
+rpRunner™ - Zero-touch CLI for RunPod GPU management
 
 Core pod management functionality only.
 For ComfyUI automation, see rpComfy add-on.
@@ -22,8 +22,8 @@ from ssh_client import SSHClient
 from runpod_client import RunPodClient
 
 
-class RPAgent:
-    """Core RunPod agent for pod management"""
+class RPRunner:
+    """Core RunPod runner for pod management"""
     
     def __init__(self):
         self.console = Console()
@@ -260,19 +260,19 @@ class RPAgent:
 def main():
     """Main CLI entry point"""
     parser = argparse.ArgumentParser(
-        description="rpAgent - Zero-touch CLI for RunPod GPU management",
+        description="rpRunner™ - Zero-touch CLI for RunPod GPU management",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  rpagent.py pods                     # List all pods
-  rpagent.py connect abc123xyz        # Connect to pod
-  rpagent.py check                    # Health check current pod
-  rpagent.py start abc123xyz          # Start a pod
-  rpagent.py stop                     # Stop current pod
-  rpagent.py upload file.txt          # Upload file
-  rpagent.py download /workspace/out.png ./local.png
-  rpagent.py status                   # Show current pod info
-  rpagent.py keys                     # Verify API keys
+  rprunner.py pods                     # List all pods
+  rprunner.py connect abc123xyz        # Connect to pod
+  rprunner.py check                    # Health check current pod
+  rprunner.py start abc123xyz          # Start a pod
+  rprunner.py stop                     # Stop current pod
+  rprunner.py upload file.txt          # Upload file
+  rprunner.py download /workspace/out.png ./local.png
+  rprunner.py status                   # Show current pod info
+  rprunner.py keys                     # Verify API keys
 
 Add-ons:
   rpComfy - ComfyUI workflow automation
@@ -287,57 +287,57 @@ Add-ons:
     
     args = parser.parse_args()
     
-    # Initialize agent
-    agent = RPAgent()
+    # Initialize runner
+    runner = RPRunner()
     
     # Route commands
     cmd = args.command.lower()
     
     if cmd in ['pods', 'list', 'rpp']:
-        agent.list_pods()
+        runner.list_pods()
     
     elif cmd in ['connect', 'rpconnect']:
         if not args.args:
-            print("Usage: rpagent.py connect <pod_id>")
+            print("Usage: rprunner.py connect <pod_id>")
             sys.exit(1)
-        agent.connect_pod(args.args[0])
+        runner.connect_pod(args.args[0])
     
     elif cmd in ['check', 'rpcheck', 'health']:
-        agent.check_pod()
+        runner.check_pod()
     
     elif cmd in ['start', 'rpstart']:
         if not args.args:
-            print("Usage: rpagent.py start <pod_id>")
+            print("Usage: rprunner.py start <pod_id>")
             sys.exit(1)
-        agent.start_pod(args.args[0])
+        runner.start_pod(args.args[0])
     
     elif cmd in ['stop', 'rpstop']:
         pod_id = args.args[0] if args.args else None
-        agent.stop_pod(pod_id)
+        runner.stop_pod(pod_id)
     
     elif cmd in ['upload', 'rpupload']:
         if not args.args:
-            print("Usage: rpagent.py upload <local_file> [remote_path]")
+            print("Usage: rprunner.py upload <local_file> [remote_path]")
             sys.exit(1)
         local_path = args.args[0]
         remote_path = args.args[1] if len(args.args) > 1 else "/workspace/"
-        agent.upload_file(local_path, remote_path)
+        runner.upload_file(local_path, remote_path)
     
     elif cmd in ['download', 'rpdownload']:
         if len(args.args) < 2:
-            print("Usage: rpagent.py download <remote_path> <local_path>")
+            print("Usage: rprunner.py download <remote_path> <local_path>")
             sys.exit(1)
-        agent.download_file(args.args[0], args.args[1])
+        runner.download_file(args.args[0], args.args[1])
     
     elif cmd in ['status', 'rpstatus']:
-        agent.show_status()
+        runner.show_status()
     
     elif cmd in ['keys', 'rpkeys', 'verify']:
-        agent.verify_keys()
+        runner.verify_keys()
     
     else:
         print(f"Unknown command: {cmd}")
-        print("Run 'rpagent.py --help' for usage")
+        print("Run 'rprunner.py --help' for usage")
         sys.exit(1)
 
 

@@ -1,5 +1,5 @@
 """
-rpAgent Configuration
+rpRunner™ Configuration
 Copy to config.py and set your values
 """
 import os
@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 class AgentConfig:
-    """Simplified configuration for rpAgent core"""
+    """Simplified configuration for rpRunner core"""
     
     def __init__(self):
         # RunPod API Key (required)
@@ -16,7 +16,7 @@ class AgentConfig:
         
         if not self.runpod_api_key:
             # Try loading from secrets file
-            secrets_path = Path(os.getenv('RPAGENT_SECRETS', Path.home() / "rpagent" / "Secrets"))
+            secrets_path = Path(os.getenv('RPRUNNER_SECRETS', Path.home() / "rprunner" / "Secrets"))
             key_file = secrets_path / "Runpod_API_Key.json"
             if key_file.exists():
                 with open(key_file) as f:
@@ -30,7 +30,7 @@ class AgentConfig:
         self.ssh_key_path = Path(os.getenv('SSH_KEY_PATH', Path.home() / ".ssh" / "id_ed25519"))
         
         # Workspace (where POD_STATE.json is stored)
-        self.workspace_path = Path(os.getenv('RPAGENT_WORKSPACE', Path.home() / "rpagent"))
+        self.workspace_path = Path(os.getenv('RPRUNNER_WORKSPACE', Path.home() / "rprunner"))
         self.workspace_path.mkdir(parents=True, exist_ok=True)
         
         # Pod state

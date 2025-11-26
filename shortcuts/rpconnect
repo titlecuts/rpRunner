@@ -40,7 +40,7 @@ def load_runpod_api_key():
         return api_key
     
     # Use same paths as config.py
-    base_path = Path(os.getenv("RPAGENT_BASE_PATH", Path.home() / "rpagent"))
+    base_path = Path(os.getenv("RPRUNNER_BASE_PATH", Path.home() / "rprunner"))
     secrets_path = base_path / "Secrets"
     runpod_key_file = secrets_path / "Runpod_API_Key.json"
     
@@ -155,7 +155,7 @@ def create_pod_state(pod_id, ssh_user, pod_name=None):
     ssh_key = "~/.ssh/id_ed25519"
     
     # Save to TitleCuts_AI_Comfy_Repo directory
-    base_path = Path(os.getenv("RPAGENT_BASE_PATH", Path.home() / "rpagent"))
+    base_path = Path(os.getenv("RPRUNNER_BASE_PATH", Path.home() / "rprunner"))
     comfy_repo_dir = base_path / "TitleCuts_AI_Comfy_Repo"
     state_file = comfy_repo_dir / "POD_STATE.json"
     
@@ -204,10 +204,10 @@ def main():
         print("  1. Auto-fetch SSH connection info from RunPod API")
         print("  2. Test the SSH connection")
         print("  3. Create POD_STATE.json")
-        print("  4. Make rpagent and shortcuts work with your pod")
+        print("  4. Make rprunner and shortcuts work with your pod")
         print()
         print("Note: Requires RunPod API key at:")
-        print("  ~/rpagent/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
+        print("  ~/rprunner/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
         print()
         print("If API key is missing, falls back to manual SSH entry.")
         print()
@@ -226,7 +226,7 @@ def main():
         print_color("\n❌ RunPod API key not found", Colors.RED)
         print()
         print("API key should be at:")
-        print("  ~/rpagent/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
+        print("  ~/rprunner/Secrets/Runpod_API_Key.json or set RUNPOD_API_KEY env var")
         print()
         print("Falling back to manual SSH entry...")
         print()
