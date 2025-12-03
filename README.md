@@ -6,7 +6,7 @@
 [![Python](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-Built by **Allan @ TitleCuts** for documentary and commercial video production.
+Built by **Dr_M4ng0 @ TitleCuts** for documentary and commercial video production.
 
 ---
 
