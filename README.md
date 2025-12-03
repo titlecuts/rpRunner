@@ -161,7 +161,7 @@ I'm available for:
 | **Custom Pipeline Builds** | I'll build YOUR AI video infrastructure |
 | **Training & Workshops** | Teach your team the methodology |
 
-📧 **Email**: [allan@titlecuts.com](mailto:allan@titlecuts.com)
+📧 **Email**: [titlecuts@gmail.com](mailto:titlecuts@gmail.com)
 
 ---
 
