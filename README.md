@@ -24,7 +24,7 @@ Built by **Dr_M4ng0 @ TitleCuts** for documentary and commercial video productio
 | | 🔒 Script parsing & shot generation |
 | | 🔒 Project/scene/character context |
 | | 🔒 **Visual Gallery** - hover preview, ratings |
-| | 🔒 **Premiere Pro Integration** - frame export + smart metadata |
+| | 🔒 **Premiere Pro Beta v26 Integration** - CEP panel, one-click frame export |
 
 **Want the full rig?** [Contact me](#-work-with-me)
 
@@ -59,7 +59,7 @@ Built by **Dr_M4ng0 @ TitleCuts** for documentary and commercial video productio
 
 ### 🆕 Visual Review & NLE Integration (Dec 2025)
 - **Visual Gallery** (`rpgallery`): Browser-based shot review with thumbnail grid, hover-to-play preview, 5-star ratings, notes, and one-click regeneration commands. Review 10 videos in 3 minutes instead of 30.
-- **Premiere Pro Integration** (`rppremiere`): Export frames directly from timeline with automatic metadata capture (source path, bin location, timecode, track). Smart detection distinguishes AI-generated clips from traditional footage.
+- **Premiere Pro Beta v26 Integration**: Native CEP panel (Window > Extensions > rpRunner) for one-click frame export with automatic metadata capture. Works with Adobe's latest beta where Scripts menu was removed. Exports PNG + JSON sidecar with sequence, timecode, and frame path.
 - **Traditional Footage Ingestion**: Tag camera/stock footage during export to bring it into the AI pipeline. Original and AI-generated versions organized together.
 
 ### 259 ComfyUI Templates
