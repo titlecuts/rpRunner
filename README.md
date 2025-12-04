@@ -23,6 +23,8 @@ Built by **Dr_M4ng0 @ TitleCuts** for documentary and commercial video productio
 | | 🔒 Lipsync pipelines |
 | | 🔒 Script parsing & shot generation |
 | | 🔒 Project/scene/character context |
+| | 🔒 **Visual Gallery** - hover preview, ratings |
+| | 🔒 **Premiere Pro Integration** - frame export + smart metadata |
 
 **Want the full rig?** [Contact me](#-work-with-me)
 
@@ -54,6 +56,11 @@ Built by **Dr_M4ng0 @ TitleCuts** for documentary and commercial video productio
 - **Characters**: Consistent character definitions across generations
 - **Shots**: Track and iterate on specific shots
 - **Script Parsing**: Import Fountain screenplays, auto-generate shot lists
+
+### 🆕 Visual Review & NLE Integration (Dec 2025)
+- **Visual Gallery** (`rpgallery`): Browser-based shot review with thumbnail grid, hover-to-play preview, 5-star ratings, notes, and one-click regeneration commands. Review 10 videos in 3 minutes instead of 30.
+- **Premiere Pro Integration** (`rppremiere`): Export frames directly from timeline with automatic metadata capture (source path, bin location, timecode, track). Smart detection distinguishes AI-generated clips from traditional footage.
+- **Traditional Footage Ingestion**: Tag camera/stock footage during export to bring it into the AI pipeline. Original and AI-generated versions organized together.
 
 ### 259 ComfyUI Templates
 - **ControlNet** (18 templates): Pose, depth, canny edge, lineart, segmentation
@@ -94,6 +101,16 @@ rpbatch run "rpvideo upscale -i {input}" -i ./720p/*.mp4 --parallel
 # Project-aware generation (all outputs organized automatically)
 rpproject switch harper_bell
 rpvideo i2v -i scene.png -p "slow push in" --scene "forest_search" --shot 12
+
+# Visual gallery - review your generated outputs
+rpgallery                        # Open gallery for current project
+rpgallery --starred              # Show only your best takes
+rpgallery export -o selects.csv  # Export ratings for client review
+
+# Premiere Pro integration - export frame at playhead
+rppremiere export                           # Inherits metadata from AI clips
+rppremiere export -s ext-forest --shot 005  # Tag traditional footage
+rppremiere watch                            # Auto-import new AI outputs to project
 ```
 
 ---
